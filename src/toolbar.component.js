@@ -44,7 +44,7 @@ export default ({
                     cameraType === CameraTypes.back ? CameraTypes.front : CameraTypes.back
                 )}>
                     <Ionicons
-                        name="md-reverse-camera"
+                        name="camera-reverse"
                         color="white"
                         size={30}
                     />

@@ -20,7 +20,7 @@ export default StyleSheet.create({
     bottomToolbar: {
         width: winWidth,
         position: 'absolute',
-        height: 100,
+        height: 160,
         bottom: 0,
     },
     captureBtn: {
@@ -46,12 +46,29 @@ export default StyleSheet.create({
         bottom: 100 
     },
     galleryImageContainer: { 
-        width: 75, 
-        height: 75, 
+        width: 100, 
+        height: 100, 
         marginRight: 5 
     },
     galleryImage: { 
-        width: 75, 
-        height: 75 
+        width: 100, 
+        height: 100,
+    },
+    galleryItemHighlighted:{
+        borderWidth: 2,
+        borderColor: "#fff"
+    },
+    uploadButton:{
+        position:"absolute",
+        zIndex:3,
+        backgroundColor:"#fff",
+        borderRadius:50,
+        padding: 8,
+        marginLeft: 6,
+        marginTop: 8,
+        height: 42,
+        flexDirection:"row",
+        justifyContent:"center",
+        alignItems:"center"
     }
 });

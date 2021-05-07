@@ -1,6 +1,6 @@
 import React from 'react';
 import { Camera } from 'expo-camera';
-import { View, Text } from 'react-native';
+import { View, Text ,Alert} from 'react-native';
 import * as Permissions from 'expo-permissions';
 
 import styles from './styles';
@@ -29,13 +29,60 @@ export default class CameraPage extends React.Component {
 
     handleShortCapture = async () => {
         const photoData = await this.camera.takePictureAsync();
-        this.setState({ capturing: false, captures: [photoData, ...this.state.captures] })
+        this.setState({ capturing: false, captures: [{...photoData,selected:false}, ...this.state.captures] })
     };
+
+    toggleSelectedImage = (image) => {
+        this.setState({ capturing: false, captures: this.state.captures.map(innerImage => innerImage===image?({...image,selected:!image.selected}):({...innerImage,selected:false}))  })
+    }
 
     handleLongCapture = async () => {
         const videoData = await this.camera.recordAsync();
         this.setState({ capturing: false, captures: [videoData, ...this.state.captures] });
     };
+
+    deleteImage = (image) => {
+        this.setState({ capturing: false, captures: this.state.captures.filter(innerImage => innerImage!==image)})
+    }
+
+    uploadImage = (imageToUpload) => {
+        
+        const formData = new FormData()
+
+        const imageName = imageToUpload.uri.split("/").pop()
+        const type = imageToUpload.uri.split(".").pop()
+
+        formData.append("image",{
+        name: imageName,
+        type: "image/"+type,
+        uri: imageToUpload.uri
+        })
+
+        fetch("http://192.168.43.237:3000/api/detect/",{
+            method:"POST",
+            headers:{
+            "Content-Type":"multipart/form-data"
+        },
+            body:formData
+        })
+        .then(data =>{ 
+            console.log(data)
+            return data.json()
+        })
+        .then(data => {
+            if(data.hasOwnProperty("text")){
+                this.deleteImage(imageToUpload)
+                console.log(data)
+                Alert.alert("Success!","Uploaded successfully")
+            } else {
+                throw Error("Something went wrong")
+            }
+        })
+        .catch(err =>{ 
+            console.log(err)
+            Alert.alert("OOps!","Something went wrong, please try again")
+        })
+    }
 
     async componentDidMount() {
         const camera = await Permissions.askAsync(Permissions.CAMERA);
@@ -65,7 +112,7 @@ export default class CameraPage extends React.Component {
                     />
                 </View>
 
-                {captures.length > 0 && <Gallery captures={captures}/>}
+                {captures.length > 0 && <Gallery uploadImage={this.uploadImage} toggleSelectedImage={this.toggleSelectedImage} captures={captures}/>}
 
                 <Toolbar 
                     capturing={capturing}
